@@ -1,6 +1,6 @@
 import unittest
 
-from web_scrawler_script.node_class import Node
+from web_crawler_script.node_class import Node
 
 
 class TestDepthFirstSearchAlogrithm(unittest.TestCase):
