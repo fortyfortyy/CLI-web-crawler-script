@@ -24,6 +24,7 @@ class NumpyArrayEncoder(json.JSONEncoder):
 def save_to_file(to_format: str, output: str, node: Node, base_url: str) -> None:
     """
     Function that saves results to the given path
+    :param base_url: base url for the name of the file
     :param to_format: json or csv
     :param output: path to file
     :param node: main instance of Node()

@@ -3,8 +3,8 @@ from urllib.parse import urlparse, urljoin
 import aiohttp
 import asyncio
 
-import typer
 from bs4 import BeautifulSoup
+import typer
 
 from node_class import Node
 from utils import is_valid
