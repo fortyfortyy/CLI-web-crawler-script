@@ -2,7 +2,8 @@
 
 <h2> Web Crawler Script </h2>
 A simple web crawler script that will fetch and process data from the specified website and all its subpages linked 
-from the main page and subpages of subpages etc. 
+from the main page and subpages of subpages etc. Results are either print in console or save in csv or json format to 
+the file.
 
 ****Script has implemented Depth-First Search algorithm to save pages in Nodes**** 
 
@@ -10,9 +11,9 @@ from the main page and subpages of subpages etc.
 ## Table of contents
 * [Technologies Used](#technologies-used)
 * [Setup](#setup)
-* [Examples of the script](#Examples of the script)
+* [Examples of the script](#examples-of-the-script)
 
-## Examples and how to run the script
+## Examples & How to run the script
 <p> 1) Results are saved in CSV/JSON file format where each row is representing one page, with the following columns/keys:</p>
 
 ```
@@ -25,7 +26,7 @@ from the main page and subpages of subpages etc.
 *if on the page there are multiple references to the one page, count it as a one
 Example csv file provided in the repository. </br></br>
 Example:
-
+<div id="examples"></div>
 <p align="center">
   <img src="https://i.imgur.com/zf6j8JX.png" width="80%" height="80%">
 </p>
@@ -77,7 +78,15 @@ $ git clone https://github.com/fortyfortyy/CLI-web-crawler-script.git
 $ cd ../CLI-web-crawler-script
 $ pip install requirements.txt
 ```
-<p align="right">(<a href="#top">back to top</a>)</p>
+- _Go to the web_clawler_script directory_ 
+```
+$ cd web_clawler_script
+```
+- _And go back to Examples & How to run_  
+```
+$ cd web_clawler_script
+```
+<p align="right">(<a href="#top">back to examples</a>)</p>
 
 
 <!-- CONTACT -->
