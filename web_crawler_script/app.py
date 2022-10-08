@@ -1,9 +1,9 @@
 import time
 from functools import wraps
 
-from web_scrawler_script.main import async_get_data, REFERENCES, EXTERNAL_URLS, INTERNAL_URLS
-from web_scrawler_script.utils import save_to_file
-from web_scrawler_script.node_class import Node
+from main import async_get_data, REFERENCES, EXTERNAL_URLS, INTERNAL_URLS
+from utils import save_to_file
+from node_class import Node
 
 import asyncio
 import typer
@@ -36,7 +36,8 @@ def crawl(page: str, format: str, output: str) -> None:
         typer.echo()
         return
 
-    save_to_file(format, output, start_node)
+    clean_url = page[8:].replace("/", "")
+    save_to_file(format, output, start_node, clean_url)
     typer.echo(f"[+] Total External links: {typer.style(len(EXTERNAL_URLS), fg=typer.colors.GREEN, bold=True)}")
     typer.echo(f"[+] Total Internal links: {typer.style(len(INTERNAL_URLS), fg=typer.colors.GREEN, bold=True)}")
     total = len(EXTERNAL_URLS) + len(INTERNAL_URLS)

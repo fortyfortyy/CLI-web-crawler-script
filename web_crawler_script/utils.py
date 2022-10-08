@@ -2,6 +2,8 @@ import os
 
 import csv
 import json
+from urllib.parse import urlparse
+
 import numpy
 
 import typer
@@ -19,7 +21,7 @@ class NumpyArrayEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def save_to_file(to_format: str, output: str, node: Node) -> None:
+def save_to_file(to_format: str, output: str, node: Node, base_url: str) -> None:
     """
     Function that saves results to the given path
     :param to_format: json or csv
@@ -27,15 +29,15 @@ def save_to_file(to_format: str, output: str, node: Node) -> None:
     :param node: main instance of Node()
     :return:
     """
-    file_name = f"data.{to_format}"
+    file_name = f"{base_url}.{to_format}"
     check_if_output_exist(output)
 
     get_all_nodes, _ = node.depth_first_search(array=[], to_format=to_format)
 
     to_format = to_format.lower()
     if to_format == "csv":
-        columns = ["link", "title", "number of internal links", "number of external links",
-                   "number of times url was referenced by other pages"]
+        columns = ["url", "title", "internal links count", "external links count",
+                   "reference count"]
 
         with open(f"{output}/{file_name}", 'w', encoding='UTF-8') as f:
             writer = csv.writer(f)
@@ -63,3 +65,14 @@ def check_if_output_exist(output: str) -> None:
     if not is_exist:
         os.makedirs(output)
         typer.secho('New directory was created to save the results.', fg=typer.colors.YELLOW)
+
+
+def is_valid(url: str) -> bool:
+    """
+    Checks whether 'url' is valid URL.
+    Valid url means when it has schema (http or https) and netloc (e.g. www.google.com:80)
+    :param url: website link
+    :return: boolean
+    """
+    parsed = urlparse(url)
+    return bool(parsed.netloc) and bool(parsed.scheme)

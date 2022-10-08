@@ -33,8 +33,11 @@ class Node:
         :param array: arrray takes an empty array that will store all children nodes in the future
         :return: array of start_node's nodes
         """
-        to_format = kwargs.get("to_format")
-        array.append(self.name)
+        to_format = kwargs.get("to_format", False)
+        if not to_format:
+            # for testing purpose
+            array.append(self.name)
+
         for node in self.children:
             _, num_of_sub_children = node.depth_first_search(array, to_format=to_format)
             self.total_num_of_children += num_of_sub_children

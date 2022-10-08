@@ -7,6 +7,7 @@ import typer
 from bs4 import BeautifulSoup
 
 from node_class import Node
+from utils import is_valid
 
 # INTERNAL_URLS and EXTERNAL_URLS avoid duplications in links to check again
 INTERNAL_URLS = set()
@@ -25,7 +26,7 @@ async def get_html_async(url: str):
                 return ""
             except aiohttp.InvalidURL:
                 typer.secho(
-                    f"Invalid url {url} | Please put the full link e.g. https://www.google.com/", fg=typer.colors.YELLOW
+                    f"Invalid url {url}", fg=typer.colors.YELLOW
                 )
                 return ""
             except aiohttp.ServerTimeoutError:
@@ -39,6 +40,10 @@ async def get_html_async(url: str):
                 return ""
             except UnicodeDecodeError:
                 typer.secho(f"Can't decode html page from {url} | Skipping to the next url..",
+                            fg=typer.colors.YELLOW)
+                return ""
+            except AssertionError:
+                typer.secho(f"Port is not free.",
                             fg=typer.colors.YELLOW)
                 return ""
 
@@ -60,20 +65,12 @@ def extract_page_data(base_url: str, html_page):
     # domain name of the URL without the protocol
     domain_name = urlparse(base_url).netloc
 
-    # html_page is invalid either type is None or len is 0 etc...
-    if html_page is None or len(html_page) == 0:
-        return links_to_check_again, "", number_of_internal_links, number_of_external_links
-
     soup = BeautifulSoup(html_page, "lxml")
-    title = soup.find("title")
-    if not hasattr(title, "string") or title.string is None:
-        title = ""
-    else:
-        # remove leading and trailing whitespaces
-        title = " ".join(title.string.split())
+    title = soup.find("title").get_text()
 
     # temporary set of references to pages
     references_to_pages = set()
+    INTERNAL_URLS.add(base_url)
 
     for a_tag in soup.findAll("a"):
         href = a_tag.attrs.get("href")
@@ -89,7 +86,24 @@ def extract_page_data(base_url: str, html_page):
         # join the URL if it's relative (not absolute link)
         href = urljoin(base_url, href)
 
-        if domain_name not in href:
+        # remove URL GET parameters, ULR fragments, etc.
+        parsed_href = urlparse(href)
+        href = parsed_href.scheme + "://" + parsed_href.netloc + parsed_href.path
+
+        while href.endswith("/"):
+            if href[-2] != "/":
+                break
+            href = href[:-1]
+
+        if not href.endswith("/"):
+            href = href + "/"
+
+        # breakpoint()
+        if not is_valid(href):
+            # not a valid URL
+            continue
+
+        if not href.startswith('https://') or not href.startswith(f"https://{domain_name}"):
             # external link
             if href not in EXTERNAL_URLS:
                 EXTERNAL_URLS.add(href)
@@ -121,7 +135,10 @@ def extract_page_data(base_url: str, html_page):
 
 async def async_get_data(base_url: str, node: Node) -> None:
     # get html source
-    html_page = await get_html_async(base_url)
+    html_page = await get_html_async(base_url.lower())
+
+    if html_page is None or html_page == "":
+        return
 
     # get data from the page
     sub_links, title, num_of_internal_links, num_of_external_links = extract_page_data(base_url, html_page)
